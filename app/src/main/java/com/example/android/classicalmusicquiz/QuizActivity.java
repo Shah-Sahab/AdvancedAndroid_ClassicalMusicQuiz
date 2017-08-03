@@ -20,23 +20,30 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -68,7 +75,6 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
         // Initialize the player view.
         mPlayerView = (SimpleExoPlayerView) findViewById(R.id.playerView);
-
 
         boolean isNewGame = !getIntent().hasExtra(REMAINING_SONGS_KEY);
 
@@ -149,7 +155,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
 
-            // TODO (2): Set the ExoPlayer.EventListener to this activity
+            mExoPlayer.addListener(mExoPlayerEventListener);
             
             // Prepare the MediaSource.
             String userAgent = Util.getUserAgent(this, "ClassicalMusicQuiz");
@@ -260,5 +266,58 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         releasePlayer();
     }
 
-    // TODO (3): Add conditional logging statements to the onPlayerStateChanged() method that log when ExoPlayer is playing or paused.
+    ExoPlayer.EventListener mExoPlayerEventListener = new ExoPlayer.EventListener() {
+
+        private final String TAG = "Exo Event Listener";
+
+        @Override
+        public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+        }
+
+        @Override
+        public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+        }
+
+        @Override
+        public void onLoadingChanged(boolean isLoading) {
+
+        }
+
+        @Override
+        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            // Play / Pause state indicator
+            Log.e(TAG, "Play when ready: " + playWhenReady);
+            String playBackState = null;
+            switch (playbackState) {
+                case ExoPlayer.STATE_IDLE:
+                    playBackState = "STATE_IDLE";
+                break;
+                case ExoPlayer.STATE_BUFFERING:
+                    playBackState = "STATE_BUFFERING";
+                break;
+                case ExoPlayer.STATE_READY:
+                    playBackState = "STATE_READY";
+                break;
+                case ExoPlayer.STATE_ENDED:
+                    playBackState = "STATE_ENDED";
+                break;
+            }
+            // Playback state: STATE_IDLE, STATE_BUFFERING, STATE_READY, STATE_ENDED
+            Log.e(TAG, "Player State: " + playBackState);
+
+        }
+
+        @Override
+        public void onPlayerError(ExoPlaybackException error) {
+
+        }
+
+        @Override
+        public void onPositionDiscontinuity() {
+
+        }
+    };
+
 }
