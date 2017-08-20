@@ -331,17 +331,17 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onPlay() {
-
+            mExoPlayer.setPlayWhenReady(true);
         }
 
         @Override
         public void onPause() {
-
+            mExoPlayer.setPlayWhenReady(false);
         }
 
         @Override
         public void onSkipToPrevious() {
-
+            mExoPlayer.seekTo(0);
         }
     }
 }
